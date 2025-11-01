@@ -110,7 +110,6 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
             </div>
           )}
         </div>
-      </a>
     </Link>
   );
 };
