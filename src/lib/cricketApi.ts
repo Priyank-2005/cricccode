@@ -63,11 +63,11 @@ class CricketDataApi {
   ): Promise<Match[]> {
     const params = new URLSearchParams();
 
+    // Add API key
+    params.append('apikey', API_KEY || '');
+
     if (format && format !== 'all') params.append('format', format);
     if (status && status !== 'all') params.append('status', status);
-    if (startDate) params.append('startDate', startDate);
-    if (endDate) params.append('endDate', endDate);
-    if (team && team.length > 0) params.append('team', team.join(','));
 
     const url = `${this.baseUrl}/matches?${params.toString()}`;
 
