@@ -265,10 +265,8 @@ export default function MatchDetailPage() {
 
       <main style={{ padding: '2rem 0' }}>
         <div className="container">
-          <Link href="/">
-            <a style={{ color: '#4da6ff', marginBottom: '1rem', display: 'inline-block' }}>
-              ← Back to Home
-            </a>
+          <Link href="/" style={{ color: '#4da6ff', marginBottom: '1rem', display: 'inline-block' }}>
+            ← Back to Home
           </Link>
 
           {error && !match && (
