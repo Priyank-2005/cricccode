@@ -26,7 +26,7 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({ series }) => {
             style={{
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: start,
+              alignItems: 'start',
               marginBottom: '1rem',
             }}
           >
