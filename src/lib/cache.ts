@@ -5,7 +5,7 @@ interface CacheEntry<T> {
   ttl: number; // in seconds
 }
 
-class Cache {
+export class Cache {
   private store: Map<string, CacheEntry<any>> = new Map();
 
   set<T>(key: string, data: T, ttlSeconds: number): void {
