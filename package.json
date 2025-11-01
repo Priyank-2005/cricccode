@@ -17,5 +17,14 @@
   "bugs": {
     "url": "https://github.com/Priyank-2005/cricccode/issues"
   },
-  "homepage": "https://github.com/Priyank-2005/cricccode#readme"
+  "homepage": "https://github.com/Priyank-2005/cricccode#readme",
+  "dependencies": {
+    "@types/node": "^24.9.2",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "next": "^14.2.33",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.9.3"
+  }
 }
