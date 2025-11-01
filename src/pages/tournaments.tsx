@@ -5,8 +5,6 @@ import { SeriesCard } from '@/components/SeriesCard';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { ErrorMessage, EmptyState } from '@/components/ErrorMessage';
 import { Series } from '@/types/cricket';
-import '@/styles/globals.css';
-import '@/styles/components.css';
 
 export default function Tournaments() {
   const [loading, setLoading] = useState(true);
