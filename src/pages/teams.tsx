@@ -5,8 +5,6 @@ import { TeamCard } from '@/components/TeamCard';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { ErrorMessage, EmptyState } from '@/components/ErrorMessage';
 import { TeamInfo } from '@/types/cricket';
-import '@/styles/globals.css';
-import '@/styles/components.css';
 
 export default function Teams() {
   const [loading, setLoading] = useState(true);
