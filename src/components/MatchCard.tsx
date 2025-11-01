@@ -43,8 +43,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
 
   return (
     <Link href={`/match/${match.matchId}`}>
-      <a>
-        <div className="match-card">
+      <div className="match-card" style={{ display: 'block', cursor: 'pointer' }}>
           <div className="match-card-header">
             <div className="match-series">{match.series}</div>
             <span className={`match-status-badge ${status}`}>{statusText}</span>
