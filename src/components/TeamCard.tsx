@@ -39,7 +39,6 @@ export const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
             </div>
           )}
         </div>
-      </a>
     </Link>
   );
 };
