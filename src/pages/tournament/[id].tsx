@@ -79,10 +79,8 @@ export default function TournamentDetail() {
 
       <main style={{ padding: '2rem 0' }}>
         <div className="container">
-          <Link href="/tournaments">
-            <a style={{ color: '#4da6ff', marginBottom: '1rem', display: 'inline-block' }}>
-              ← Back to Tournaments
-            </a>
+          <Link href="/tournaments" style={{ color: '#4da6ff', marginBottom: '1rem', display: 'inline-block' }}>
+            ← Back to Tournaments
           </Link>
 
           {error && !series && (
