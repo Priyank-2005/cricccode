@@ -20,8 +20,7 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({ series }) => {
 
   return (
     <Link href={`/tournament/${series.seriesId}`}>
-      <a>
-        <div className="series-card">
+      <div className="series-card" style={{ display: 'block', cursor: 'pointer' }}>
           <div
             style={{
               display: 'flex',
