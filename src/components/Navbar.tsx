@@ -17,8 +17,8 @@ export const Navbar: React.FC = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <Link href="/">
-          <a className="navbar-brand">🏏 CricCode</a>
+        <Link href="/" className="navbar-brand">
+          🏏 CricCode
         </Link>
 
         <ul className="navbar-links">
