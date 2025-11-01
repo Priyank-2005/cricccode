@@ -4,8 +4,6 @@ import { Navbar } from '@/components/Navbar';
 import { SkeletonText } from '@/components/SkeletonLoader';
 import { ErrorMessage, EmptyState } from '@/components/ErrorMessage';
 import { Rankings, RankingEntry } from '@/types/cricket';
-import '@/styles/globals.css';
-import '@/styles/components.css';
 
 export default function RankingsPage() {
   const [loading, setLoading] = useState(true);
