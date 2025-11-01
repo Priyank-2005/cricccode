@@ -81,7 +81,11 @@ class CricketDataApi {
   }
 
   async getMatchDetail(matchId: string): Promise<MatchDetail | null> {
-    const url = `${this.baseUrl}/matches/${matchId}`;
+    const params = new URLSearchParams();
+    params.append('apikey', API_KEY || '');
+    params.append('id', matchId);
+
+    const url = `${this.baseUrl}/match?${params.toString()}`;
 
     try {
       const data = await this.fetchWithTimeout(url);
@@ -94,6 +98,7 @@ class CricketDataApi {
 
   async getSeries(status?: string): Promise<Series[]> {
     const params = new URLSearchParams();
+    params.append('apikey', API_KEY || '');
     if (status && status !== 'all') params.append('status', status);
 
     const url = `${this.baseUrl}/series?${params.toString()}`;
@@ -108,7 +113,10 @@ class CricketDataApi {
   }
 
   async getTeams(): Promise<TeamInfo[]> {
-    const url = `${this.baseUrl}/teams`;
+    const params = new URLSearchParams();
+    params.append('apikey', API_KEY || '');
+
+    const url = `${this.baseUrl}/countries?${params.toString()}`;
 
     try {
       const data = await this.fetchWithTimeout(url);
@@ -120,7 +128,11 @@ class CricketDataApi {
   }
 
   async getTeamDetail(teamId: string): Promise<TeamDetail | null> {
-    const url = `${this.baseUrl}/teams/${teamId}`;
+    const params = new URLSearchParams();
+    params.append('apikey', API_KEY || '');
+    params.append('id', teamId);
+
+    const url = `${this.baseUrl}/country_matches?${params.toString()}`;
 
     try {
       const data = await this.fetchWithTimeout(url);
@@ -137,9 +149,7 @@ class CricketDataApi {
     category?: PlayerRankingCategory
   ): Promise<Rankings | null> {
     const params = new URLSearchParams();
-    params.append('type', type);
-    if (format) params.append('format', format);
-    if (category) params.append('category', category);
+    params.append('apikey', API_KEY || '');
 
     const url = `${this.baseUrl}/rankings?${params.toString()}`;
 
