@@ -64,10 +64,8 @@ export default function TeamDetailPage() {
 
       <main style={{ padding: '2rem 0' }}>
         <div className="container">
-          <Link href="/teams">
-            <a style={{ color: '#4da6ff', marginBottom: '1rem', display: 'inline-block' }}>
-              ← Back to Teams
-            </a>
+          <Link href="/teams" style={{ color: '#4da6ff', marginBottom: '1rem', display: 'inline-block' }}>
+            ← Back to Teams
           </Link>
 
           {error && !team && (
