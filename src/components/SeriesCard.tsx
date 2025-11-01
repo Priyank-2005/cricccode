@@ -65,7 +65,6 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({ series }) => {
             </div>
           </div>
         </div>
-      </a>
     </Link>
   );
 };
