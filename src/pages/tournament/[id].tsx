@@ -8,8 +8,6 @@ import { SkeletonText } from '@/components/SkeletonLoader';
 import { ErrorMessage, EmptyState } from '@/components/ErrorMessage';
 import { Series, Match, PointsTableEntry } from '@/types/cricket';
 import { formatDate } from '@/lib/utils';
-import '@/styles/globals.css';
-import '@/styles/components.css';
 
 export default function TournamentDetail() {
   const router = useRouter();
