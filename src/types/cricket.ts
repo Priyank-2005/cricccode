@@ -57,12 +57,13 @@ export interface Match {
   };
 }
 
-export interface MatchDetail extends Match {
+export interface MatchDetail {
+  matchId: string;
   series: {
     id: string;
     name: string;
   };
-  city?: string;
+  format: MatchFormat;
   team1: Team & {
     flag_url: string;
     innings?: Innings;
@@ -71,8 +72,18 @@ export interface MatchDetail extends Match {
     flag_url: string;
     innings?: Innings;
   };
+  venue: string;
+  city?: string;
+  date: string; // ISO datetime
+  status: MatchStatus;
+  result?: string;
   manOfTheMatch?: string;
   toss?: string;
+  odds?: {
+    team1: number;
+    team2: number;
+    draw: number;
+  };
 }
 
 export interface Series {
