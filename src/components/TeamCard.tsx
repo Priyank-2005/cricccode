@@ -14,8 +14,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
 
   return (
     <Link href={`/team/${team.teamId}`}>
-      <a>
-        <div className="team-card">
+      <div className="team-card" style={{ display: 'block', cursor: 'pointer' }}>
           <div className="team-flag">
             {team.flag_url ? (
               <img
