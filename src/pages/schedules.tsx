@@ -8,8 +8,6 @@ import { MatchCardSkeleton } from '@/components/SkeletonLoader';
 import { ErrorMessage, EmptyState } from '@/components/ErrorMessage';
 import { Match, TeamInfo } from '@/types/cricket';
 import { getUpcomingDateRange } from '@/lib/utils';
-import '@/styles/globals.css';
-import '@/styles/components.css';
 
 export default function Schedules() {
   const router = useRouter();
