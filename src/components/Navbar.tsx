@@ -24,14 +24,13 @@ export const Navbar: React.FC = () => {
         <ul className="navbar-links">
           {navLinks.map((link) => (
             <li key={link.href}>
-              <Link href={link.href}>
-                <a
-                  className={`navbar-link ${
-                    router.pathname === link.href ? 'active' : ''
-                  }`}
-                >
-                  {link.label}
-                </a>
+              <Link
+                href={link.href}
+                className={`navbar-link ${
+                  router.pathname === link.href ? 'active' : ''
+                }`}
+              >
+                {link.label}
               </Link>
             </li>
           ))}
