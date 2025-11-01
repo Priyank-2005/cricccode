@@ -11,22 +11,17 @@ import {
   PlayerRankingCategory,
 } from '@/types/cricket';
 
-const API_BASE_URL = process.env.CRICKET_DATA_API_BASE_URL;
+const API_BASE_URL = 'https://api.cricapi.com/v1';
 const API_KEY = process.env.CRICKET_DATA_API_KEY;
 
 if (!API_KEY) {
   console.warn('CRICKET_DATA_API_KEY is not set in environment variables');
 }
 
-const headers = {
-  'Content-Type': 'application/json',
-  Authorization: `Bearer ${API_KEY}`,
-};
-
 class CricketDataApi {
   private baseUrl: string;
 
-  constructor(baseUrl: string = API_BASE_URL || 'https://api.cricketdata.org/v1') {
+  constructor(baseUrl: string = API_BASE_URL) {
     this.baseUrl = baseUrl;
   }
 
@@ -36,7 +31,6 @@ class CricketDataApi {
 
     try {
       const response = await fetch(url, {
-        headers,
         signal: controller.signal,
       });
 
@@ -46,7 +40,14 @@ class CricketDataApi {
         throw new Error(`API Error: ${response.status} ${response.statusText}`);
       }
 
-      return await response.json();
+      const json = await response.json();
+
+      // Check for API success status
+      if (json.status !== 'success') {
+        throw new Error(`API Error: ${json.info || 'Unknown error'}`);
+      }
+
+      return json;
     } catch (error) {
       clearTimeout(id);
       throw error;
