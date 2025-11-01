@@ -5,8 +5,6 @@ import { MatchCard } from '@/components/MatchCard';
 import { MatchCardSkeleton } from '@/components/SkeletonLoader';
 import { ErrorMessage, EmptyState } from '@/components/ErrorMessage';
 import { Match } from '@/types/cricket';
-import '@/styles/globals.css';
-import '@/styles/components.css';
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
