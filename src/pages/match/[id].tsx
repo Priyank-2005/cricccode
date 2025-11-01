@@ -7,8 +7,6 @@ import { SkeletonText } from '@/components/SkeletonLoader';
 import { ErrorMessage, EmptyState } from '@/components/ErrorMessage';
 import { MatchDetail, Batsman, Bowler } from '@/types/cricket';
 import { formatDateTime, formatResultText } from '@/lib/utils';
-import '@/styles/globals.css';
-import '@/styles/components.css';
 
 export default function MatchDetailPage() {
   const router = useRouter();
