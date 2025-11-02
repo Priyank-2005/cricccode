@@ -29,11 +29,11 @@ export default function AdminDashboard() {
       router.push('/admin/login');
     } else {
       setAdminPassword(stored);
-      fetchMatches(stored);
+      fetchMatches();
     }
   }, [router]);
 
-  const fetchMatches = async (password: string) => {
+  const fetchMatches = async () => {
     try {
       setLoading(true);
       const res = await fetch('/api/matches?limit=1000');
@@ -66,7 +66,7 @@ export default function AdminDashboard() {
         setMessage('Match updated successfully!');
         setSelectedMatch(null);
         setUpdateData({});
-        fetchMatches(adminPassword);
+        fetchMatches();
       } else {
         setMessage(data.error || 'Update failed');
       }
@@ -99,7 +99,7 @@ export default function AdminDashboard() {
           `Import successful! Imported: ${data.stats.imported}, Updated: ${data.stats.updated}`
         );
         setImportFile(null);
-        fetchMatches(adminPassword);
+        fetchMatches();
       } else {
         setMessage(data.error || 'Import failed');
       }
