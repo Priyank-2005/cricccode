@@ -1,170 +1,211 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Navbar } from '@/components/Navbar';
-import { MatchCard } from '@/components/MatchCard';
-import { FilterBar } from '@/components/FilterBar';
-import { MatchCardSkeleton } from '@/components/SkeletonLoader';
-import { ErrorMessage, EmptyState } from '@/components/ErrorMessage';
-import { Match, TeamInfo } from '@/types/cricket';
-import { getDateRangeFromNow } from '@/lib/utils';
+import Navbar from '@/src/components/Navbar';
+import MatchCard from '@/src/components/MatchCard';
+import FilterBar from '@/src/components/FilterBar';
 
-export default function Results() {
+export default function ResultsPage() {
   const router = useRouter();
+  const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [matches, setMatches] = useState<Match[]>([]);
-  const [teams, setTeams] = useState<TeamInfo[]>([]);
+  const [error, setError] = useState('');
 
   // Filter states
-  const [format, setFormat] = useState<string>('all');
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
-  const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+  const [format, setFormat] = useState(
+    (router.query.format as string) || 'all'
+  );
+  const [startDate, setStartDate] = useState(
+    (router.query.startDate as string) || ''
+  );
+  const [endDate, setEndDate] = useState(
+    (router.query.endDate as string) || ''
+  );
 
-  // Initialize date range
   useEffect(() => {
-    const { startDate: start, endDate: end } = getDateRangeFromNow(30);
-    setStartDate(start);
-    setEndDate(end);
-  }, []);
-
-  // Load teams
-  useEffect(() => {
-    const loadTeams = async () => {
-      try {
-        const res = await fetch('/api/teams');
-        if (res.ok) {
-          const data: TeamInfo[] = await res.json();
-          setTeams(data);
-        }
-      } catch (err) {
-        console.error('Failed to load teams:', err);
-      }
-    };
-
-    loadTeams();
-  }, []);
-
-  // Fetch matches whenever filters change
-  useEffect(() => {
-    if (startDate && endDate) {
-      fetchMatches();
-    }
-  }, [format, startDate, endDate, selectedTeams]);
+    fetchMatches();
+  }, [format, startDate, endDate]);
 
   const fetchMatches = async () => {
+    setLoading(true);
+    setError('');
+
     try {
-      setLoading(true);
-      setError(null);
+      const params = new URLSearchParams({
+        status: 'completed',
+        limit: '100',
+      });
 
-      const params = new URLSearchParams();
-      params.append('status', 'completed');
-      if (format !== 'all') params.append('format', format);
-      if (startDate) params.append('startDate', startDate);
-      if (endDate) params.append('endDate', endDate);
-      if (selectedTeams.length > 0) params.append('team', selectedTeams.join(','));
-
-      const res = await fetch(`/api/matches?${params.toString()}`);
-      if (!res.ok) {
-        throw new Error('Failed to fetch matches');
+      if (format !== 'all') {
+        params.append('format', format);
       }
 
-      const data: Match[] = await res.json();
+      if (startDate) {
+        params.append('startDate', startDate);
+      }
 
-      // Sort by date descending (most recent first)
-      const sorted = [...data].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
+      if (endDate) {
+        params.append('endDate', endDate);
+      }
 
-      setMatches(sorted);
+      const res = await fetch(`/api/matches?${params.toString()}`);
+      const data = await res.json();
+
+      if (data.success) {
+        setMatches(data.data);
+      } else {
+        setError('Failed to fetch matches');
+      }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to fetch results'
-      );
+      console.error('Error fetching matches:', err);
+      setError('Failed to load matches. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFormatChange = (fmt: string) => {
-    setFormat(fmt);
+  const handleFormatChange = (newFormat: string) => {
+    setFormat(newFormat);
+    updateUrl({ format: newFormat });
   };
 
-  const handleDateRangeChange = (start: string, end: string) => {
-    setStartDate(start);
-    setEndDate(end);
+  const handleStartDateChange = (newDate: string) => {
+    setStartDate(newDate);
+    updateUrl({ startDate: newDate });
   };
 
-  const handleTeamChange = (teamIds: string[]) => {
-    setSelectedTeams(teamIds);
+  const handleEndDateChange = (newDate: string) => {
+    setEndDate(newDate);
+    updateUrl({ endDate: newDate });
   };
 
   const handleClearFilters = () => {
     setFormat('all');
-    const { startDate: start, endDate: end } = getDateRangeFromNow(30);
-    setStartDate(start);
-    setEndDate(end);
-    setSelectedTeams([]);
+    setStartDate('');
+    setEndDate('');
+    router.push('/results');
+  };
+
+  const updateUrl = (newParams: any) => {
+    const params = new URLSearchParams();
+    if (newParams.format && newParams.format !== 'all') {
+      params.append('format', newParams.format);
+    }
+    if (newParams.startDate) {
+      params.append('startDate', newParams.startDate);
+    }
+    if (newParams.endDate) {
+      params.append('endDate', newParams.endDate);
+    }
+
+    const query = params.toString();
+    router.push(`/results${query ? '?' + query : ''}`, undefined, {
+      shallow: true,
+    });
   };
 
   return (
     <>
       <Head>
-        <title>Cricket Results - CricCode</title>
-        <meta name="description" content="Browse completed cricket matches and results" />
+        <title>Match Results - CricCode</title>
+        <meta name="description" content="Cricket match results and scores" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
       <Navbar />
 
-      <main style={{ padding: '2rem 0' }}>
-        <div className="container">
-          <h1 style={{ marginBottom: '2rem', color: '#e8ecf1' }}>
-            Cricket Results
+      <div style={{ minHeight: 'calc(100vh - 70px)', backgroundColor: '#0f1419' }}>
+        <div
+          style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '2rem',
+          }}
+        >
+          <h1
+            style={{
+              color: '#e8ecf1',
+              fontSize: '2rem',
+              marginBottom: '1.5rem',
+            }}
+          >
+            Match Results
           </h1>
 
           <FilterBar
             onFormatChange={handleFormatChange}
-            onDateRangeChange={handleDateRangeChange}
-            onTeamChange={handleTeamChange}
+            onStartDateChange={handleStartDateChange}
+            onEndDateChange={handleEndDateChange}
             onClearFilters={handleClearFilters}
-            formats={['Test', 'ODI', 'T20I', 'T20']}
-            teams={teams.map((t) => ({ id: t.teamId, name: t.name }))}
-            initialFormat={format}
-            initialStartDate={startDate}
-            initialEndDate={endDate}
+            currentFormat={format}
+            currentStartDate={startDate}
+            currentEndDate={endDate}
           />
 
           {error && (
-            <ErrorMessage
-              message={error}
-              onRetry={fetchMatches}
-              showRetry={true}
-            />
+            <div
+              style={{
+                backgroundColor: 'rgba(255, 68, 68, 0.1)',
+                border: '1px solid #ff4444',
+                color: '#ff4444',
+                padding: '1rem',
+                borderRadius: '8px',
+                marginBottom: '2rem',
+              }}
+            >
+              {error}
+            </div>
           )}
 
           {loading ? (
-            <MatchCardSkeleton count={5} />
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+              <p style={{ color: '#a0aab8', fontSize: '1.1rem' }}>
+                Loading results...
+              </p>
+            </div>
           ) : matches.length > 0 ? (
             <div>
+              <p style={{ color: '#a0aab8', marginBottom: '1.5rem' }}>
+                Found {matches.length} match result
+                {matches.length !== 1 ? 's' : ''}
+              </p>
               {matches.map((match) => (
                 <MatchCard key={match.matchId} match={match} />
               ))}
             </div>
           ) : (
-            <EmptyState
-              title="No Results Found"
-              message="Try adjusting your filters to see more results."
-              icon="🔍"
-              actionButton={{
-                label: 'Clear Filters',
-                onClick: handleClearFilters,
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '2rem',
+                backgroundColor: '#1a1f26',
+                borderRadius: '8px',
+                border: '1px solid #2d3339',
               }}
-            />
+            >
+              <p style={{ color: '#a0aab8', fontSize: '1.1rem' }}>
+                No match results found with the current filters
+              </p>
+              <button
+                onClick={handleClearFilters}
+                style={{
+                  marginTop: '1rem',
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: '#4da6ff',
+                  color: '#000',
+                  border: 'none',
+                  borderRadius: '4px',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                Clear Filters
+              </button>
+            </div>
           )}
         </div>
-      </main>
+      </div>
     </>
   );
 }
