@@ -1,171 +1,167 @@
-import React, { useState, useCallback } from 'react';
-import { useRouter } from 'next/router';
-import { MatchFormat } from '@/types/cricket';
+import React from 'react';
 
 interface FilterBarProps {
   onFormatChange: (format: string) => void;
-  onDateRangeChange: (startDate: string, endDate: string) => void;
-  onTeamChange: (teams: string[]) => void;
+  onStartDateChange: (date: string) => void;
+  onEndDateChange: (date: string) => void;
   onClearFilters: () => void;
-  formats?: MatchFormat[];
-  teams?: Array<{ id: string; name: string }>;
-  initialFormat?: string;
-  initialStartDate?: string;
-  initialEndDate?: string;
+  currentFormat: string;
+  currentStartDate: string;
+  currentEndDate: string;
 }
 
-export const FilterBar: React.FC<FilterBarProps> = ({
+export default function FilterBar({
   onFormatChange,
-  onDateRangeChange,
-  onTeamChange,
+  onStartDateChange,
+  onEndDateChange,
   onClearFilters,
-  formats = ['Test', 'ODI', 'T20I', 'T20'],
-  teams = [],
-  initialFormat = 'all',
-  initialStartDate = '',
-  initialEndDate = '',
-}) => {
-  const [format, setFormat] = useState(initialFormat);
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
-  const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
-  const [showTeamDropdown, setShowTeamDropdown] = useState(false);
-
-  const handleFormatChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newFormat = e.target.value;
-    setFormat(newFormat);
-    onFormatChange(newFormat);
-  };
-
-  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newStartDate = e.target.value;
-    setStartDate(newStartDate);
-    onDateRangeChange(newStartDate, endDate);
-  };
-
-  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newEndDate = e.target.value;
-    setEndDate(newEndDate);
-    onDateRangeChange(startDate, newEndDate);
-  };
-
-  const handleTeamToggle = (teamId: string) => {
-    let newTeams: string[];
-    if (selectedTeams.includes(teamId)) {
-      newTeams = selectedTeams.filter((t) => t !== teamId);
-    } else {
-      newTeams = [...selectedTeams, teamId];
-    }
-    setSelectedTeams(newTeams);
-    onTeamChange(newTeams);
-  };
-
-  const handleClearFilters = () => {
-    setFormat('all');
-    setStartDate('');
-    setEndDate('');
-    setSelectedTeams([]);
-    setShowTeamDropdown(false);
-    onClearFilters();
-  };
-
-  const hasActiveFilters =
-    format !== 'all' || startDate || endDate || selectedTeams.length > 0;
-
+  currentFormat,
+  currentStartDate,
+  currentEndDate,
+}: FilterBarProps) {
   return (
-    <div className="filter-bar">
-      <div className="filter-group">
-        <label className="filter-label">Format:</label>
-        <select
-          value={format}
-          onChange={handleFormatChange}
-          className="filter-select"
-        >
-          <option value="all">All Formats</option>
-          {formats.map((fmt) => (
-            <option key={fmt} value={fmt.toLowerCase()}>
-              {fmt}
-            </option>
-          ))}
-        </select>
-      </div>
+    <div
+      style={{
+        backgroundColor: '#1a1f26',
+        border: '1px solid #2d3339',
+        borderRadius: '8px',
+        padding: '1.5rem',
+        marginBottom: '2rem',
+      }}
+    >
+      <h3 style={{ color: '#e8ecf1', marginTop: 0, marginBottom: '1.5rem' }}>
+        Filters
+      </h3>
 
-      <div className="filter-group">
-        <label className="filter-label">From:</label>
-        <input
-          type="date"
-          value={startDate}
-          onChange={handleStartDateChange}
-          className="filter-input"
-        />
-      </div>
-
-      <div className="filter-group">
-        <label className="filter-label">To:</label>
-        <input
-          type="date"
-          value={endDate}
-          onChange={handleEndDateChange}
-          className="filter-input"
-        />
-      </div>
-
-      {teams.length > 0 && (
-        <div className="filter-group" style={{ position: 'relative' }}>
-          <label className="filter-label">Teams:</label>
-          <button
-            onClick={() => setShowTeamDropdown(!showTeamDropdown)}
-            className="filter-select"
-            style={{ cursor: 'pointer' }}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '1.5rem',
+          marginBottom: '1.5rem',
+        }}
+      >
+        {/* Format Filter */}
+        <div>
+          <label
+            style={{
+              display: 'block',
+              color: '#a0aab8',
+              marginBottom: '0.5rem',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+            }}
           >
-            {selectedTeams.length > 0
-              ? `${selectedTeams.length} selected`
-              : 'Select teams'}
-          </button>
-          {showTeamDropdown && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                backgroundColor: '#1a1f26',
-                border: '1px solid #2d3339',
-                borderRadius: '4px',
-                zIndex: 10,
-                marginTop: '0.5rem',
-                minWidth: '200px',
-              }}
-            >
-              {teams.map((team) => (
-                <label
-                  key={team.id}
-                  style={{
-                    display: 'flex',
-                    padding: '0.5rem 1rem',
-                    cursor: 'pointer',
-                    borderBottom: '1px solid #2d3339',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedTeams.includes(team.id)}
-                    onChange={() => handleTeamToggle(team.id)}
-                  />
-                  {team.name}
-                </label>
-              ))}
-            </div>
-          )}
+            Match Format
+          </label>
+          <select
+            value={currentFormat}
+            onChange={(e) => onFormatChange(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              backgroundColor: '#252c35',
+              color: '#e8ecf1',
+              border: '1px solid #2d3339',
+              borderRadius: '4px',
+              fontSize: '1rem',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="all">All Formats</option>
+            <option value="Test">Test</option>
+            <option value="ODI">ODI</option>
+            <option value="T20">T20</option>
+            <option value="T20I">T20I</option>
+          </select>
         </div>
-      )}
 
-      {hasActiveFilters && (
-        <button onClick={handleClearFilters} className="btn btn-secondary">
-          Clear Filters
-        </button>
-      )}
+        {/* Start Date Filter */}
+        <div>
+          <label
+            style={{
+              display: 'block',
+              color: '#a0aab8',
+              marginBottom: '0.5rem',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+            }}
+          >
+            Start Date
+          </label>
+          <input
+            type="date"
+            value={currentStartDate}
+            onChange={(e) => onStartDateChange(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              backgroundColor: '#252c35',
+              color: '#e8ecf1',
+              border: '1px solid #2d3339',
+              borderRadius: '4px',
+              fontSize: '1rem',
+              cursor: 'pointer',
+            }}
+          />
+        </div>
+
+        {/* End Date Filter */}
+        <div>
+          <label
+            style={{
+              display: 'block',
+              color: '#a0aab8',
+              marginBottom: '0.5rem',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+            }}
+          >
+            End Date
+          </label>
+          <input
+            type="date"
+            value={currentEndDate}
+            onChange={(e) => onEndDateChange(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              backgroundColor: '#252c35',
+              color: '#e8ecf1',
+              border: '1px solid #2d3339',
+              borderRadius: '4px',
+              fontSize: '1rem',
+              cursor: 'pointer',
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Clear Filters Button */}
+      <button
+        onClick={onClearFilters}
+        style={{
+          padding: '0.75rem 1.5rem',
+          backgroundColor: 'transparent',
+          border: '1px solid #4da6ff',
+          color: '#4da6ff',
+          borderRadius: '4px',
+          fontSize: '1rem',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          transition: 'all 0.3s ease',
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLElement).style.backgroundColor = '#4da6ff';
+          (e.currentTarget as HTMLElement).style.color = '#000';
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+          (e.currentTarget as HTMLElement).style.color = '#4da6ff';
+        }}
+      >
+        Clear Filters
+      </button>
     </div>
   );
-};
+}
