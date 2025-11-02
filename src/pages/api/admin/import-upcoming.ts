@@ -45,16 +45,15 @@ export default async function handler(
       try {
         const existingMatch = await Match.findOne({ matchId: matchData.matchId });
 
-        let result;
         if (existingMatch) {
-          result = await Match.findByIdAndUpdate(
+          await Match.findByIdAndUpdate(
             existingMatch._id,
             matchData,
             { new: true }
           );
           updated++;
         } else {
-          result = await Match.create(matchData);
+          await Match.create(matchData);
           imported++;
         }
 
