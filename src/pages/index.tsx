@@ -1,53 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
-import { Navbar } from '@/components/Navbar';
-import { MatchCard } from '@/components/MatchCard';
-import { MatchCardSkeleton } from '@/components/SkeletonLoader';
-import { ErrorMessage, EmptyState } from '@/components/ErrorMessage';
-import { Match } from '@/types/cricket';
+import Navbar from '@/src/components/Navbar';
+import MatchCard from '@/src/components/MatchCard';
 
-export default function Home() {
+export default function HomePage() {
+  const [recentMatches, setRecentMatches] = useState<any[]>([]);
+  const [upcomingMatches, setUpcomingMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [recentMatches, setRecentMatches] = useState<Match[]>([]);
-  const [liveMatches, setLiveMatches] = useState<Match[]>([]);
-  const [upcomingMatches, setUpcomingMatches] = useState<Match[]>([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchMatches();
   }, []);
 
   const fetchMatches = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError('');
 
-      // Fetch all matches
-      const res = await fetch('/api/matches?status=all');
-      if (!res.ok) {
-        throw new Error('Failed to fetch matches');
+    try {
+      // Fetch completed matches (recent)
+      const completedRes = await fetch(
+        '/api/matches?status=completed&limit=3'
+      );
+      const completedData = await completedRes.json();
+
+      // Fetch upcoming matches
+      const upcomingRes = await fetch(
+        '/api/matches?status=upcoming&limit=3'
+      );
+      const upcomingData = await upcomingRes.json();
+
+      if (completedData.success) {
+        setRecentMatches(completedData.data);
       }
 
-      const allMatches: Match[] = await res.json();
-
-      // Categorize matches
-      const live = allMatches.filter((m) => m.status === 'live').slice(0, 1);
-      const upcoming = allMatches
-        .filter((m) => m.status === 'upcoming')
-        .slice(0, 2);
-      const recent = allMatches
-        .filter((m) => m.status === 'completed')
-        .slice(0, 2);
-
-      setLiveMatches(live);
-      setUpcomingMatches(upcoming);
-      setRecentMatches(recent);
+      if (upcomingData.success) {
+        setUpcomingMatches(upcomingData.data);
+      }
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Cricket data unavailable. Please try again later.'
-      );
+      console.error('Error fetching matches:', err);
+      setError('Failed to load matches. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -56,83 +48,142 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>CricCode - Live Cricket Scores & Schedules</title>
-        <meta
-          name="description"
-          content="Get live cricket scores, match schedules, and results"
-        />
+        <title>CricCode - Cricket Scores & Updates</title>
+        <meta name="description" content="Get live cricket scores, schedules, and results" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
       <Navbar />
 
-      <main style={{ padding: '2rem 0' }}>
-        <div className="container">
+      <div style={{ minHeight: 'calc(100vh - 70px)', backgroundColor: '#0f1419' }}>
+        <div
+          style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '2rem',
+          }}
+        >
+          {/* Hero Section */}
+          <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
+            <h1
+              style={{
+                fontSize: '2.5rem',
+                color: '#4da6ff',
+                marginBottom: '0.5rem',
+              }}
+            >
+              Welcome to CricCode
+            </h1>
+            <p style={{ color: '#a0aab8', fontSize: '1.1rem' }}>
+              Your source for cricket scores and schedules
+            </p>
+          </div>
+
           {error && (
-            <ErrorMessage
-              message={error}
-              onRetry={fetchMatches}
-              showRetry={true}
-            />
+            <div
+              style={{
+                backgroundColor: 'rgba(255, 68, 68, 0.1)',
+                border: '1px solid #ff4444',
+                color: '#ff4444',
+                padding: '1rem',
+                borderRadius: '8px',
+                marginBottom: '2rem',
+              }}
+            >
+              {error}
+            </div>
           )}
 
           {loading ? (
-            <>
-              <h2 style={{ marginBottom: '1rem', color: '#e8ecf1' }}>
-                Recent Matches
-              </h2>
-              <MatchCardSkeleton count={2} />
-            </>
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+              <p style={{ color: '#a0aab8', fontSize: '1.1rem' }}>
+                Loading matches...
+              </p>
+            </div>
           ) : (
             <>
+              {/* Recent Matches Section */}
               {recentMatches.length > 0 && (
-                <>
-                  <h2 style={{ marginBottom: '1rem', color: '#e8ecf1' }}>
-                    Recent Matches
-                  </h2>
-                  {recentMatches.map((match) => (
-                    <MatchCard key={match.matchId} match={match} />
-                  ))}
-                </>
-              )}
-
-              {liveMatches.length > 0 && (
-                <>
+                <section style={{ marginBottom: '3rem' }}>
                   <h2
-                    style={{ marginBottom: '1rem', marginTop: '2rem', color: '#ff4444' }}
+                    style={{
+                      color: '#e8ecf1',
+                      fontSize: '1.5rem',
+                      marginBottom: '1.5rem',
+                      borderBottom: '2px solid #4da6ff',
+                      paddingBottom: '0.5rem',
+                    }}
                   >
-                    🔴 Live Matches
+                    Recent Results
                   </h2>
-                  {liveMatches.map((match) => (
-                    <MatchCard key={match.matchId} match={match} />
-                  ))}
-                </>
+                  <div>
+                    {recentMatches.map((match) => (
+                      <MatchCard key={match.matchId} match={match} />
+                    ))}
+                  </div>
+                </section>
               )}
 
+              {/* Upcoming Matches Section */}
               {upcomingMatches.length > 0 && (
-                <>
-                  <h2 style={{ marginBottom: '1rem', marginTop: '2rem', color: '#e8ecf1' }}>
+                <section style={{ marginBottom: '3rem' }}>
+                  <h2
+                    style={{
+                      color: '#e8ecf1',
+                      fontSize: '1.5rem',
+                      marginBottom: '1.5rem',
+                      borderBottom: '2px solid #4da6ff',
+                      paddingBottom: '0.5rem',
+                    }}
+                  >
                     Upcoming Matches
                   </h2>
-                  {upcomingMatches.map((match) => (
-                    <MatchCard key={match.matchId} match={match} />
-                  ))}
-                </>
+                  <div>
+                    {upcomingMatches.map((match) => (
+                      <MatchCard key={match.matchId} match={match} />
+                    ))}
+                  </div>
+                </section>
               )}
 
-              {recentMatches.length === 0 &&
-                liveMatches.length === 0 &&
-                upcomingMatches.length === 0 && (
-                  <EmptyState
-                    title="No Matches Found"
-                    message="There are currently no cricket matches scheduled."
-                    icon="🏏"
-                  />
-                )}
+              {/* Empty State */}
+              {recentMatches.length === 0 && upcomingMatches.length === 0 && (
+                <div
+                  style={{
+                    textAlign: 'center',
+                    padding: '3rem 1rem',
+                    color: '#a0aab8',
+                  }}
+                >
+                  <p style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>
+                    No matches found
+                  </p>
+                  <p style={{ fontSize: '0.9rem', color: '#6b7684' }}>
+                    Data is being imported. Please check back soon.
+                  </p>
+                </div>
+              )}
+
+              {/* Browse All Link */}
+              {(recentMatches.length > 0 || upcomingMatches.length > 0) && (
+                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                  <a
+                    href="/schedules"
+                    style={{
+                      color: '#4da6ff',
+                      fontWeight: 'bold',
+                      fontSize: '1rem',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    View all schedules →
+                  </a>
+                </div>
+              )}
             </>
           )}
         </div>
-      </main>
+      </div>
     </>
   );
 }
