@@ -82,7 +82,7 @@ function calculateInningsStats(inningsData: any) {
   const bowlers: Record<string, IBowler> = {};
 
   // Parse deliveries from overs
-  overs.forEach((over: any, overIndex: number) => {
+  overs.forEach((over: any) => {
     const deliveries = over.deliveries || [];
 
     deliveries.forEach((delivery: any) => {
@@ -152,9 +152,6 @@ function calculateInningsStats(inningsData: any) {
       totalBalls += 1;
     });
   });
-
-  // Calculate overs
-  const totalOvers = Math.floor(totalBalls / 6) + (totalBalls % 6) / 10;
 
   return {
     team: inningsData.team || '',
